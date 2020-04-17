@@ -8,13 +8,18 @@ export class JokesController extends BaseController {
     super("api/jokes");
     this.router
       .get("", this.getAll)
-      // NOTE: Beyond this point all routes require Authorization tokens (the user must be logged in)
       .use(auth0Provider.getAuthorizedUserInfo)
+      // NOTE: Beyond this point all routes require Authorization tokens (the user must be logged in)
+      .get("", this.getByLoggedInUser)
       .post("", this.create);
   }
 
   async getAll(req, res, next) {
     try {
+      console.log(req.query)
+      if (req.query.user) {
+        return next()
+      }
       res.send(await jokesService.findAll());
     } catch (error) {
       next(error);
